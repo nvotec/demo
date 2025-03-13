@@ -30,14 +30,26 @@
 
             setup() {
 
-                const setting = {
-                    proxy: 'https://localhost:7095',
-                    key: '68c0a975-b8b2-46c8-92c0-44211944e1d8-D48E1905-1C45-40E4-BCEE-08DD6096D463',
-                    clientId: '68c0a975-b8b2-46c8-92c0-44211944e1d8',
-                    projectId: 'A6E5F5D6-18BE-47A3-94C0-904E3CB3D594',
-                    environmentId: 'D48E1905-1C45-40E4-BCEE-08DD6096D463',
-                };
+                const getSettingsFromURL() {
 
+                    const params = new URLSearchParams(window.location.search);
+
+                    // Créer l'objet setting avec les valeurs des paramètres d'URL
+                    const setting = {
+                        proxy: params.get('proxy'),  // Valeur par défaut si paramètre absent
+                        flow: params.get('flow'),
+                        clientId: params.get('clientId'),
+                        projectId: params.get('projectId'),
+                        environmentId: params.get('environmentId'),
+                    };
+
+                    setting.key = setting.clientId + setting.projectId;
+
+                    return setting;
+                }
+
+                const setting = getSettingsFromURL();
+                  
                 const data = ref(null);
                 const loading = ref(true);
 
@@ -80,7 +92,7 @@
                 const fetchContent = async () => {
                     try {
                         //Call reservation-salle.nxf service
-                        const payload = await callFlow('b15d92be-d2b3-435a-9465-86969254e4d6');
+                        const payload = await callFlow(setting.flow);
                         if (payload && payload.length > 0) {
                             const firstItem = payload[0];
                             if (firstItem.code === 200) {
