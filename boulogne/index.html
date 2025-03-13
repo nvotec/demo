@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Réservation de Salle</title>
+      <link href="https://preline.co/assets/css/main.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+      <link href="styles.css" rel="stylesheet">
+    
+      <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+      <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/preline@2.0.3/dist/preline.min.js"></script>
+      <script src="script.js"></script>
+      <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+
+    <div id="app">
+        <div v-if="loading">Chargement...</div>
+        <div v-else>
+            <div id="dynamic-content" v-html="data"></div> <!-- Injection du HTML -->
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, watch } = Vue;
+
+        createApp({
+
+            setup() {
+
+                const setting = {
+                    proxy: 'https://localhost:7095',
+                    key: '68c0a975-b8b2-46c8-92c0-44211944e1d8-D48E1905-1C45-40E4-BCEE-08DD6096D463',
+                    clientId: '68c0a975-b8b2-46c8-92c0-44211944e1d8',
+                    projectId: 'A6E5F5D6-18BE-47A3-94C0-904E3CB3D594',
+                    environmentId: 'D48E1905-1C45-40E4-BCEE-08DD6096D463',
+                };
+
+                const data = ref(null);
+                const loading = ref(true);
+
+                const callFlow = async (flowUrl, formData = new FormData()) => {
+                    const postUrl = `${setting.proxy}/clients/${setting.clientId}/flows`;
+
+                    ['n_url', 'n_clientId', 'projectId', 'environmentId', 'n_connectionId', 'n_userId'].forEach((key) =>
+                        formData.delete(key)
+                    );
+
+                    formData.append('n_url', flowUrl);
+                    formData.append('n_userId', '');
+                    formData.append('n_connectionId', '');
+                    formData.append('n_clientId', setting.clientId);
+                    formData.append('projectId', setting.projectId);
+                    formData.append('environmentId', setting.environmentId);
+
+                    try {
+                        const response = await fetch(postUrl, {
+                            method: 'POST',
+                            body: formData,
+                            headers: { Authorization: '' },
+                        });
+
+                        const result = await response.json();
+                        let item = result;
+
+                        if (item && item.data && typeof item.data === 'string') {
+                            item = JSON.parse(item.data);
+                        }
+
+                        return item;
+                    } catch (error) {
+                        console.error("Erreur lors de l'appel API:", error);
+                        throw new Error(error.message);
+                    }
+                };
+
+                // Simule un appel API pour récupérer un HTML Vue.js dynamique
+                const fetchContent = async () => {
+                    try {
+                        const payload = await callFlow('2c954195-c8d1-484c-9f87-7279c66708b1');
+                        if (payload && payload.length > 0) {
+                            const firstItem = payload[0];
+                            if (firstItem.code === 200) {
+                                return firstItem.payload;
+                            }
+                            else {
+                                return `
+                                    <div id="vue-dynamic">
+                                        <p>Page introuvable</p>
+                                    </div>
+                                `;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Échec de l’exécution du flux:', error);
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                // Charger le HTML depuis l'API (ou autre source)
+                const loadData = async () => {
+                    try {
+                        data.value = await fetchContent();
+                    } catch (error) {
+                        console.error("Erreur de chargement :", error);
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                loadData();
+
+                // Lorsque `data` change, monte Vue sur le contenu dynamique
+                // Lorsque `data` change, exécuter le script injecté
+                watch(data, (newValue) => {
+                    if (newValue) {
+                        setTimeout(() => {
+                            const scripts = document.getElementById("dynamic-content").getElementsByTagName("script");
+                            for (let script of scripts) {
+                                eval(script.innerText); // Exécute le script Vue inclus
+                            }
+                        }, 0);
+                    }
+                });
+                
+                return { data, loading };
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
