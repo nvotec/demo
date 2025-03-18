@@ -84,19 +84,16 @@
                     try {
                         //Call reservation-salle.nxf service
                         const payload = await callFlow(setting.flow);
-                        if (payload && payload.length > 0) {
-                            const firstItem = payload[0];
-                            if (firstItem.code === 200) {
-                                return firstItem.payload;
-                            }
-                            else {
-                                return `
-                                    <div id="vue-dynamic">
-                                        <p>Page introuvable</p>
-                                    </div>
-                                `;
-                            }
+                        if (payload.code === 200) {
+                          return payload.data;
                         }
+                        else {
+                          return `
+                              <div id="vue-dynamic">
+                                  <p>Page introuvable</p>
+                              </div>
+                          `;
+                       }
                     } catch (error) {
                         console.error('Échec de l’exécution du flux:', error);
                     } finally {
