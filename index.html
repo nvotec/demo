@@ -83,7 +83,7 @@
                 const fetchContent = async () => {
                     try {
                         //Call reservation-salle.nxf service
-                        const payload = await callFlow(setting.flow);
+                        let payload = await callFlow(setting.flow);
                         if (payload.code === 200) {
                               
                               if (payload.data && typeof payload.data === 'string') {
