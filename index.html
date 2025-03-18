@@ -85,7 +85,22 @@
                         //Call reservation-salle.nxf service
                         const payload = await callFlow(setting.flow);
                         if (payload.code === 200) {
-                          return payload.data;
+                              
+                              if (payload.data && typeof item.data === 'string') {
+                                  payload = JSON.parse(payload.data);
+                              }
+
+                              let res = payload[0];
+                              if(res && res.code === 200) {
+                                  return res.payload;
+                              }
+                              else {
+                                    return `
+                                          <div id="vue-dynamic">
+                                              <p>Page introuvable</p>
+                                          </div>
+                                      `;
+                              }
                         }
                         else {
                           return `
