@@ -86,7 +86,7 @@
                         const payload = await callFlow(setting.flow);
                         if (payload.code === 200) {
                               
-                              if (payload.data && typeof item.data === 'string') {
+                              if (payload.data && typeof payload.data === 'string') {
                                   payload = JSON.parse(payload.data);
                               }
 
