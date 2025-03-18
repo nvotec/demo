@@ -71,13 +71,8 @@
                         });
 
                         const result = await response.json();
-                        let item = result;
-
-                        if (item && item.data && typeof item.data === 'string') {
-                            item = JSON.parse(item.data);
-                        }
-
-                        return item;
+                    
+                        return result;  
                     } catch (error) {
                         console.error("Erreur lors de l'appel API:", error);
                         throw new Error(error.message);
