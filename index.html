@@ -13,7 +13,28 @@
 <body>
 
     <div id="app">
-        <div v-if="loading">Chargement...</div>
+        <div v-if="loading">
+
+ <div id="vue-dynamic" class="bg-gray-50 h-full">
+      <div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+          <div class="max-w-4xl mx-auto">
+             
+
+              <div class="h-60 mt-80 flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
+                    <div class="flex flex-auto flex-col justify-center items-center p-4 md:p-5">
+                        <div class="content justify-center">
+                            <div class="animate-spin inline-block size-6 border-3 border-current border-t-transparent text-blue-600 rounded-full dark:text-blue-500" 
+                                role="status" aria-label="loading">    
+                            </div> 
+                            <span class="mt-4 text-lg text-gray-600 dark:text-neutral-400 font-bold"> Chargement en cours </span>
+                        </div>
+                    </div>
+              </div>
+          </div>
+      </div>
+  </div>
+              
+        </div>
         <div v-else>
             <div id="dynamic-content" v-html="data"></div> <!-- Injection du HTML -->
         </div>
